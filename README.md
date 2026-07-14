@@ -53,17 +53,28 @@
 ---
 
 ## 🔬 Tasks / Assessments Performed
-
-### 1. [Task Name]
+M
+### 1. [Find all live hosts on the subnet using Ping Sweep]
 [Brief description of what you did and why]
+ping sweep to find all live hosts on my subnet to document which hosts are live so we can identify later any unidentifiable live hosts that I must look into.)
 
 ```bash
 # Command used
-[your command here]
+[sudo nmap -n --disable-arp-ping -sP 192.168.79.0/24]
+*-sP is what makes it considered a ping sweep*
 ```
+<img width="321" height="105" alt="image" src="https://github.com/user-attachments/assets/7a155223-f0bf-4037-ba05-c3272166fd92" />
+
+# Output
+Command identified 3 live hosts on the subnet:
+192.168.79.1 - Gateway/Router for the host-only network(VMwares virtual DHCP server).
+192.168.79.130 - The metasploitable 2 target (Target)
+192.168.79.129 - Kali (Attacker)
 
 **Finding:** [What did you discover?]
-
+I discovered there are 3 live hosts on this network the Gateway, Metasplotable (target), and Kali VM (ATTACKER).
+A ping sweep is essentially asking devices on the network "Which devices on this network are alive?"
+A live host is any active device with an IP address that is powered on, connected and capable of responding to network requests.
 ---
 
 ### 2. [Task Name]
@@ -142,7 +153,11 @@ This lab directly maps to the following CompTIA CySA+ (CS0-003) exam domains:
 
 ## 🔑 Technical Notes
 
-> [Any important notes about your lab setup, workarounds, or lessons learned. Example: "Always add the -n flag to Nmap scans in this VMware environment to prevent DNS resolution hangs."]
+> [Any important notes about your lab setup, workarounds, or lessons learned. Example:
+>
+> "Always add the -n flag to Nmap scans in this VMware environment to prevent DNS resolution hangs."]
+> 
+> -sP and -sT contradict eachother (Can't be used together because -sP means just do a ping/host-discovery sweep, skip ports entirely but -sT tells Nmap to do a full TCP connect port scan. These commands contradict eachother.)
 
 ```bash
 # Any important commands or workarounds
