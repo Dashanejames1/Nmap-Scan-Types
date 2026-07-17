@@ -99,7 +99,6 @@ Command identified 18 open ports on the target machine, the majority of these po
 ** -Pn is a flag used in Nmap that tells the scanner to skip the initial host discovery phase and treat all target IP addresses as online. Many modern firewalls block standard ping requests (like ICMP or specific TCP probes). Without -Pn, Nmap might assume a target is offline and refuse to scan it.**
 **-F stands for Fast Scan and reduces the number of ports Nmap tests. (Using -F restricts the scan to only the top 100 most common ports for both TCP and UDP rather than Nmap's default 1000 port scan)**
 
----
 
 ### 2. [Run a UDP scan of the top 20 ports against metasploitable ip adress and document results.]
 [Brief description of what you did and why]
