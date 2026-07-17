@@ -1,15 +1,15 @@
-# Nmap-Scan-Types
+.# Nmap-Scan-Types
 **Author:** Dashane James  
 **Lab Environment:** [e.g. VMware Workstation | Kali Linux | Metasploitable 2]  
-**Purpose:** [What is the goal of this lab/project?]  
+**Purpose:** [The goal of this repository was to use Nmap to recognize the similarities/differences in major scan types(SYN scan,UDP Scan, and full port scan.) and to recognize when is the appropriate times to utilize each scan type.
 **Status:** 🟢 Active / 🟡 In Progress / 🔵 Completed
 
 ---
 
 ## 📋 Overview
 
-[Write 2-3 sentences describing what this project is, what you did, and why. Example: "This repository documents a series of ______ assessments performed in an isolated VMware home lab. The goal was to build hands-on proficiency with ______ aligned with CySA+ exam objectives."]
-
+[This repository documents a series of nmap scan results performed in an isolated VMware home lab. I used several different scan types to target my metasploitable work station to identify which ports are open and closed while documenting the differences in each scan type. The goal was to build hands-on proficiency with nmap and identying scan types as aligned with CySA+ exam objectives."]
+0
 ---
 
 ## 🧪 Lab Environment
@@ -18,7 +18,7 @@
 |---|---|
 | Hypervisor | VMware Workstation (Host-Only Network) |
 | Attacker Machine | Kali Linux 2026.1 — `192.168.79.129` |
-| Target Machine | [Target name] — `192.168.79.130` |
+| Target Machine | [Metasploitable 2] — `192.168.79.130` |
 | Network Type | Host-Only (isolated, no internet exposure) |
 | Host OS | Windows 11 — ASUS Vivobook 14 |
 
@@ -28,7 +28,7 @@
 
 ## 🛠️ Tools Used
 
-- **[Tool 1]** — [What it does]
+- **[Nmap]** — [What it does]
 - **[Tool 2]** — [What it does]
 - **[Tool 3]** — [What it does]
 - **[Tool 4]** — [What it does]
@@ -53,52 +53,98 @@
 ---
 
 ## 🔬 Tasks / Assessments Performed
-M
-### 1. [Find all live hosts on the subnet using Ping Sweep]
-[Brief description of what you did and why]
-ping sweep to find all live hosts on my subnet to document which hosts are live so we can identify later any unidentifiable live hosts that I must look into.)
+
+### 1. [Run a SYN scan against metasploitable ip adress and document results.]
+
+I ran a SYN scan using Nmap against my metasploitable machine to identify the open ports. The SYN scan sends a SYN packet to all ports on the target host to see which are open. If the port is open, the target responds with a SYN-ACK. Instead of completing the handshake with a final ACK, Nmap sends an RST (a TCP "reset" packet) to termiante the connection. This makes it a "half-open" scan — faster and stealthier than a full TCP connect scan, since it never establishes a full connection or gets logged the same way.
 
 ```bash
 # Command used
-[sudo nmap -n --disable-arp-ping -sP 192.168.79.0/24]
-*-sP is what makes it considered a ping sweep*
-```
-<img width="321" height="105" alt="image" src="https://github.com/user-attachments/assets/7a155223-f0bf-4037-ba05-c3272166fd92" />
+[sudo nmap -sS -Pn --disable-arp-ping -n -F 192.168.79.0/24]
+
 
 # Output
-Command identified 3 live hosts on the subnet:
-192.168.79.1 - Gateway/Router for the host-only network(VMwares virtual DHCP server).
-192.168.79.130 - The metasploitable 2 target (Target)
-192.168.79.129 - Kali (Attacker)
+Command identified 18 open ports on the target machine:
 
-**Finding:** [What did you discover?]
-I discovered there are 3 live hosts on this network the Gateway, Metasplotable (target), and Kali VM (ATTACKER).
-A ping sweep is essentially asking devices on the network "Which devices on this network are alive?"
-A live host is any active device with an IP address that is powered on, connected and capable of responding to network requests.
+report for 192.168.79.130
+Host is up (0.0063s latency).
+Not shown: 82 closed tcp ports (reset)
+PORT     STATE SERVICE
+21/tcp   open  ftp
+22/tcp   open  ssh
+23/tcp   open  telnet
+25/tcp   open  smtp
+53/tcp   open  domain
+80/tcp   open  http
+111/tcp  open  rpcbind
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds
+513/tcp  open  login
+514/tcp  open  shell
+2049/tcp open  nfs
+2121/tcp open  ccproxy-ftp
+3306/tcp open  mysql
+5432/tcp open  postgresql
+5900/tcp open  vnc
+6000/tcp open  X11
+8009/tcp open  ajp13
+
+<img width="339" height="233" alt="Screenshot 2026-07-17 154853" src="https://github.com/user-attachments/assets/e8aa4079-1508-44ae-9880-4ada9d53971f" />
+
+**Finding:** 
+Command identified 18 open ports on the target machine, the majority of these ports have been identified to be vulnerabilities or possible vulnerabilities.**
+**-sS is the flag to perform a SYN Scan**
+**RST is a TCP packet with the "Reset" flag turned on, used to instantly terminate a network connection to tear down the connection.**
+** -Pn is a flag used in Nmap that tells the scanner to skip the initial host discovery phase and treat all target IP addresses as online. Many modern firewalls block standard ping requests (like ICMP or specific TCP probes). Without -Pn, Nmap might assume a target is offline and refuse to scan it.**
+**-F stands for Fast Scan and reduces the number of ports Nmap tests. (Using -F restricts the scan to only the top 100 most common ports for both TCP and UDP rather than Nmap's default 1000 port scan)**
+
 ---
 
-### 2. [Task Name]
+### 2. [Run a UDP scan of the top 20 ports against metasploitable ip adress and document results.]
 [Brief description of what you did and why]
+I ran a UDP scan using Nmap against my metasploitable machine to identify the top 20 open UDP ports.  I identfied that this is an important scan because standard TCP scans only check TCP ports while UDP requires a separate scan type entirely. Since services like DNS, SNMP, and TFTP commonly run on UDP, skipping this step can leave vulnerabilities undiscovered in an assessment.
 
 ```bash
 # Command used
-[your command here]
+[sudo nmap -sU -Pn --disable-arp-ping -n --top- ports 20 192.168.79.130]
 ```
 
-**Finding:** [What did you discover?]
+# Output 
+The output gave me the status of the top 20 UDP ports on the target machine. 3 ports were closed(msrpc,netbios-ssn, and isakmp) and the rest are open or open|filtered. 
+
+<img width="319" height="229" alt="Screenshot 2026-07-16 221006" src="https://github.com/user-attachments/assets/7a790a29-e1bd-4f69-ac5a-9510b3bb816d" />
+
+
+**Finding:**
+
+**-sU flag is used to scan for open UDP ports.**
+**UDP scans find services that TCP scans miss.**
+**--top- ports 20 : displays only the top 20 most common ports.**
+**UDP scans dont use a handshake when communicating with the target, instead UDP communicates by firing independent packets of data directly to a target port without any prior setup or connection verification. The receiving system either passes the data straight to a listening application or silently discards it if no service is active.**
+**open|filtered means Nmap couldn't definitively tell whether the port is open or blocked by a firewall — it's showing you both possibilities because it doesn't have enough information to pick one.**
+**If it gets an ICMP "port unreachable" error → the port is closed**
+**.If it gets no response at all → Nmap can't tell if that's because the port is open and the service is just silently ignoring the packet, or because a firewall dropped the packet without sending any error back**
+
 
 ---
 
-### 3. [Task Name]
-[Brief description of what you did and why]
+### 3. [.]
+[Brief description of what you did and why] I ran a full port TCP connect scan to document the results and to compare with a "fast" scan to see the difference in speed. The purpose of this is to identify when a full port scan is more suitable or a fast scan or "top 20" scan is more appropriate.
+I ran a full TCP connect scan against Metasploitable to identify every open port across all 65,535 TCP ports, rather than relying on the "top" ports list used by -F. [This scan took approximately 5.36 seconds compared to .26 seconds for the fast scan, and 1.35 seconds for the top 20 ports UDP scan.] This demonstrates why a full scan is more appropriate during a thorough assessment, while a fast/top-ports scan is better suited for quick reconnaissance or time-constrained situations where speed matters more than completeness.
 
 ```bash
 # Command used
-[your command here]
+[sudo nmap -sT -Pn --disable-arp-ping -n -p- 192.168.79.130 -oN ~/full_scan.txt.]
+
+# Output .
+
+<img width="319" height="232" alt="Screenshot 2026-07-16 222242" src="https://github.com/user-attachments/assets/cfd17a71-c494-4467-b0d8-1f3a0ae9aa21" />
+
 ```
 
 **Finding:** [What did you discover?]
-
+open|filtered means Nmap couldn't definitively tell whether the port is open or blocked by a firewall — it's showing you both possibilities because it doesn't have enough information to pick one.
+.
 ---
 
 ## 📊 Key Findings Summary
