@@ -29,10 +29,7 @@
 
 ## 🛠️ Tools Used
 
-- **[Nmap]** — [What it does]
-- **[Tool 2]** — [What it does]
-- **[Tool 3]** — [What it does]
-- **[Tool 4]** — [What it does]
+- **Nmap** — Used to run and compare SYN, UDP, and full TCP connect scans against the target
 
 ---
 
@@ -142,7 +139,7 @@ I ran a full TCP connect scan against Metasploitable to identify every open port
 
 ```
 
-**Finding:** [What did you discover?]
+**Findings:** 
 open|filtered means Nmap couldn't definitively tell whether the port is open or blocked by a firewall — it's showing you both possibilities because it doesn't have enough information to pick one.
 .
 ---
@@ -151,11 +148,12 @@ open|filtered means Nmap couldn't definitively tell whether the port is open or 
 
 | Port/Service | Tool Used | Risk Level | Notes |
 |---|---|---|---|
-| [e.g. 21/tcp FTP] | [e.g. Nmap] | 🔴 Critical | [Notes] |
-| [e.g. 23/tcp Telnet] | [e.g. Wireshark] | 🔴 Critical | [Notes] |
-| [e.g. 80/tcp HTTP] | [e.g. Nikto] | 🟠 High | [Notes] |
-| [e.g. 3306/tcp MySQL] | [e.g. OpenVAS] | 🟠 High | [Notes] |
-| [e.g. 22/tcp SSH] | [e.g. Nmap] | 🟡 Medium | [Notes] |
+| 21/tcp FTP | Nmap (SYN scan) | 🔴 Critical | Open — later confirmed to run vulnerable vsftpd 2.3.4 in a related repository |
+| 23/tcp Telnet | Nmap (SYN scan) | 🔴 Critical | Open — transmits data in plaintext |
+| 445/tcp SMB | Nmap (SYN scan) | 🟠 High | Open — legacy SMB service |
+| 3306/tcp MySQL | Nmap (SYN scan) | 🟠 High | Open — database exposed on network |
+| 5900/tcp VNC | Nmap (SYN scan) | 🔴 Critical | Open — remote desktop access, often weakly authenticated |
+| UDP (top 20) | Nmap (`-sU`) | 🟡 Medium | Several ports returned `open|filtered` — inconclusive results requiring further investigation |
 
 **Risk Levels:** 🔴 Critical | 🟠 High | 🟡 Medium | 🟢 Low
 
@@ -165,10 +163,9 @@ open|filtered means Nmap couldn't definitively tell whether the port is open or 
 
 | Action Performed | ATT&CK Tactic | Technique ID | Technique Name |
 |---|---|---|---|
-| [e.g. Port scanning] | [e.g. Reconnaissance] | [e.g. T1595] | [e.g. Active Scanning] |
-| [Action] | [Tactic] | [ID] | [Technique] |
-| [Action] | [Tactic] | [ID] | [Technique] |
-| [Action] | [Tactic] | [ID] | [Technique] |
+| SYN scan (half-open port scanning) | Reconnaissance | T1595.001 | Scanning IP Blocks |
+| UDP scan of top 20 ports | Reconnaissance | T1595.002 | Vulnerability Scanning |
+| Full TCP connect scan (all 65,535 ports) | Reconnaissance | T1046 | Network Service Discovery |
 
 ---
 
@@ -176,50 +173,45 @@ open|filtered means Nmap couldn't definitively tell whether the port is open or 
 
 Based on findings, the following remediations would be recommended in a real environment:
 
-1. **[Finding 1]** — [Recommendation]
-2. **[Finding 2]** — [Recommendation]
-3. **[Finding 3]** — [Recommendation]
-4. **[Finding 4]** — [Recommendation]
-5. **[Finding 5]** — [Recommendation]
-
----
-
-## 📚 CySA+ Exam Relevance
-
-This lab directly maps to the following CompTIA CySA+ (CS0-003) exam domains:
-
-| Domain | Coverage |
-|---|---|
-| Security Operations (33%) | [What this lab covers in this domain] |
-| Vulnerability Management (30%) | [What this lab covers in this domain] |
-| Incident Response (20%) | [What this lab covers in this domain] |
-| Reporting & Communication (17%) | [What this lab covers in this domain] |
+1. **Numerous high-risk ports open (Critical)** — Disable or restrict unnecessary services (Telnet, VNC, rlogin/rsh) that have no modern secure use case.
+2. **UDP services returning inconclusive results** — Follow up `open|filtered` UDP findings with targeted service probing to confirm actual state, since firewalls can mask true port status.
+3. **Full port range not scanned by default** — Incorporate a full-port scan (`-p-`) into routine assessments, since fast scans only check the most common ports and can miss less-common but exploitable services.
 
 ---
 
 ## 🔑 Technical Notes
 
-> [Any important notes about your lab setup, workarounds, or lessons learned. Example:
->
+
+# SYN scan (half-open, faster/stealthier than a full connect scan)
+sudo nmap -sS -Pn --disable-arp-ping -n -F 192.168.79.130
+
+# UDP scan of the top 20 ports
+sudo nmap -sU -Pn --disable-arp-ping -n --top-ports 20 192.168.79.130
+
+# Full TCP connect scan across all 65,535 ports
+sudo nmap -sT -Pn --disable-arp-ping -n -p- 192.168.79.130 -oN ~/full_scan.txt
+
+# Workaround: --top-ports requires no space or hyphen inside it —
+# "--top- ports 20" is invalid syntax; the correct form is "--top-ports 20"
+# as a single unbroken flag.
+
+# Note: -sS (SYN scan) requires root/raw socket privileges (hence sudo),
+# while -sT (TCP connect scan) does not strictly require root, though
+# sudo was used here for consistency across all scans.
+
 > "Always add the -n flag to Nmap scans in this VMware environment to prevent DNS resolution hangs."]
 > 
 > -sP and -sT contradict eachother (Can't be used together because -sP means just do a ping/host-discovery sweep, skip ports entirely but -sT tells Nmap to do a full TCP connect port scan. These commands contradict eachother.)
 
-```bash
-# Any important commands or workarounds
-[command here]
+
 ```
 
 ---
 
 ## 📌 About This Project
 
-[1-2 sentences about how this fits into your overall portfolio and career goals.]
+[This repository is part of my broader cybersecurity portfolio, focused on understanding the practical tradeoffs between different Nmap scan types — speed, stealth, and completeness — and knowing when each is the right tool for a given assessment scenario.]
 
-**Related repositories:**
-- `[Repo Name]` — [Brief description]
-- `[Repo Name]` — [Brief description]
-- `[Repo Name]` — Coming soon
 
 ---
 
