@@ -1,15 +1,15 @@
-.# Nmap-Scan-Types
+# Nmap-Scan-Types
 
 **Author:** Dashane James  
-**Lab Environment:** [e.g. VMware Workstation | Kali Linux | Metasploitable 2]  
-**Purpose:** [The goal of this repository was to use Nmap to recognize the similarities/differences in major scan types(SYN scan,UDP Scan, and full port scan.) and to recognize when is the appropriate times to utilize each scan type.
-**Status:** 🟢 Active / 🟡 In Progress / 🔵 Completed
+**Lab Environment:** VMware Workstation | Kali Linux | Metasploitable 2 
+**Purpose:** The goal of this repository was to use Nmap to recognize the similarities/differences in major scan types(SYN scan, UDP Scan, full port scan) and to recognize when is the appropriate times to utilize each scan type.
+**Status:** 🔵 Completed
 
 ---
 
 ## 📋 Overview
 
-[This repository documents a series of nmap scan results performed in an isolated VMware home lab. I used several different scan types to target my metasploitable work station to identify which ports are open and closed while documenting the differences in each scan type. The goal was to build hands-on proficiency with nmap and identying scan types as aligned with CySA+ exam objectives."]
+This repository documents a series of nmap scan results performed in an isolated VMware home lab. I used several different scan types to target my metasploitable work station to identify which ports are open and closed while documenting the differences in each scan type. The goal was to build hands-on proficiency with nmap and identying scan types as aligned with CySA+ exam objectives."
 0
 ---
 
@@ -36,29 +36,58 @@
 ## 📁 Repository Structure
 
 ```
-[Repo-Name]/
-├── README.md
-├── [folder-1]/
-│   ├── [file1.txt]        # Description of file
-│   └── [file2.md]         # Description of file
-├── [folder-2]/
-│   ├── [file3.md]         # Description of file
-│   └── [file4.txt]        # Description of file
-└── reports/
-    └── [final-report.md]  # Full assessment report
+CySA-Plus-Lab-Portfolio/
+├── README.md                                   # Portfolio overview and index
+│
+├── recon-network-discovery/
+│   ├── nmap-host-discovery-lab-baseline.md
+│   ├── nmap-scan-types-syn-tcp-udp.md
+│   ├── service-version-os-fingerprinting.md
+│   ├── wireshark-capture-and-analysis.md
+│   ├── tcpdump-cli-packet-capture.md
+│   ├── nmap-scripting-engine-nse.md
+│   └── recon-assessment-report.md
+│
+├── vulnerability-scanning-exploitation/
+│   ├── openvas-vulnerability-scan.md
+│   ├── scan-results-cvss-scoring.md
+│   ├── nikto-web-application-scanning.md
+│   ├── metasploit-first-exploitation.md
+│   ├── post-exploitation-enumeration.md
+│   ├── mitre-attack-kill-chain-mapping.md
+│   └── full-vulnerability-assessment.md
+│
+├── siem-log-analysis-incident-response/
+│   ├── splunk-install-and-log-ingestion.md
+│   ├── spl-splunk-search-language.md
+│   ├── attack-generation-and-detection.md
+│   ├── elk-stack-components.md
+│   ├── incident-response-simulation-nist.md
+│   ├── snort-ids-detection-rules.md
+│   └── incident-response-report.md
+│
+├── scenarios-and-analyst-skills/
+│   ├── full-kill-chain-red-and-blue-team.md
+│   ├── vulnerability-management-deep-review.md
+│   ├── cloud-security-aws-concepts.md
+│   ├── zero-trust-architecture-identity.md
+│   └── soar-soc-workflow-alert-triage.md
+│
+└── assets/
+    └── screenshots/ ??????????????????????????
 ```
 
 ---
 
 ## 🔬 Tasks / Assessments Performed
 
-### 1. [Run a SYN scan against metasploitable ip adress and document results.]
+### 1. Run a SYN scan against metasploitable ip adress and document results.
 
 I ran a SYN scan using Nmap against my metasploitable machine to identify the open ports. The SYN scan sends a SYN packet to all ports on the target host to see which are open. If the port is open, the target responds with a SYN-ACK. Instead of completing the handshake with a final ACK, Nmap sends an RST (a TCP "reset" packet) to termiante the connection. This makes it a "half-open" scan — faster and stealthier than a full TCP connect scan, since it never establishes a full connection or gets logged the same way.
 
 ```bash
 # Command used
-[sudo nmap -sS -Pn --disable-arp-ping -n -F 192.168.79.0/24]
+sudo nmap -sS -Pn --disable-arp-ping -n -F 192.168.79.0/24
 
 
 # Output
@@ -97,22 +126,23 @@ Command identified 18 open ports on the target machine, the majority of these po
 **-F stands for Fast Scan and reduces the number of ports Nmap tests. (Using -F restricts the scan to only the top 100 most common ports for both TCP and UDP rather than Nmap's default 1000 port scan)**
 
 
-### 2. [Run a UDP scan of the top 20 ports against metasploitable ip adress and document results.]
-[Brief description of what you did and why]
+### 2. Run a UDP scan of the top 20 ports against metasploitable ip adress and document results.
+
 I ran a UDP scan using Nmap against my metasploitable machine to identify the top 20 open UDP ports.  I identfied that this is an important scan because standard TCP scans only check TCP ports while UDP requires a separate scan type entirely. Since services like DNS, SNMP, and TFTP commonly run on UDP, skipping this step can leave vulnerabilities undiscovered in an assessment.
 
 ```bash
-# Command used
-[sudo nmap -sU -Pn --disable-arp-ping -n --top- ports 20 192.168.79.130]
+# Commands used
+
+sudo nmap -sU -Pn --disable-arp-ping -n --top- ports 20 192.168.79.130
 ```
 
 # Output 
-The output gave me the status of the top 20 UDP ports on the target machine. 3 ports were closed(msrpc,netbios-ssn, and isakmp) and the rest are open or open|filtered. 
+The output gave me the status of the top 20 UDP ports on the target machine. 3 ports were closed (msrpc,netbios-ssn, and isakmp) and the rest are open or open|filtered. 
 
 <img width="319" height="229" alt="Screenshot 2026-07-16 221006" src="https://github.com/user-attachments/assets/7a790a29-e1bd-4f69-ac5a-9510b3bb816d" />
 
 
-**Finding:**
+**Findings:**
 
 **-sU flag is used to scan for open UDP ports.**
 **UDP scans find services that TCP scans miss.**
@@ -125,13 +155,16 @@ The output gave me the status of the top 20 UDP ports on the target machine. 3 p
 
 ---
 
-### 3. [.]
-[Brief description of what you did and why] I ran a full port TCP connect scan to document the results and to compare with a "fast" scan to see the difference in speed. The purpose of this is to identify when a full port scan is more suitable or a fast scan or "top 20" scan is more appropriate.
-I ran a full TCP connect scan against Metasploitable to identify every open port across all 65,535 TCP ports, rather than relying on the "top" ports list used by -F. [This scan took approximately 5.36 seconds compared to .26 seconds for the fast scan, and 1.35 seconds for the top 20 ports UDP scan.] This demonstrates why a full scan is more appropriate during a thorough assessment, while a fast/top-ports scan is better suited for quick reconnaissance or time-constrained situations where speed matters more than completeness.
+### 3. Running a full port scan (-p) and comparing the results.
+
+I ran a full port TCP connect scan to document the results and to compare with a "fast" scan to see the difference in speed. The purpose of this is to identify when a full port scan is more suitable or a fast scan or "top 20" scan is more appropriate.
+
+I ran a full TCP connect scan against Metasploitable to identify every open port across all 65,535 TCP ports, rather than relying on the "top" ports list used by -F. This scan took approximately 5.36 seconds compared to .26 seconds for the fast scan, and 1.35 seconds for the top 20 ports UDP scan. This demonstrates why a full scan is more appropriate during a thorough assessment, while a fast/top-ports scan is better suited for quick reconnaissance or time-constrained situations where speed matters more than completeness.
 
 ```bash
 # Command used
-[sudo nmap -sT -Pn --disable-arp-ping -n -p- 192.168.79.130 -oN ~/full_scan.txt.]
+
+sudo nmap -sT -Pn --disable-arp-ping -n -p- 192.168.79.130 -oN ~/full_scan.txt
 
 # Output .
 
@@ -140,9 +173,16 @@ I ran a full TCP connect scan against Metasploitable to identify every open port
 ```
 
 **Findings:** 
+
 open|filtered means Nmap couldn't definitively tell whether the port is open or blocked by a firewall — it's showing you both possibilities because it doesn't have enough information to pick one.
 .
 ---
+
+
+### 4. The difference between SYN, Connect, and UDP scan mechanics.
+
+SYN (-sS) is the default fast and stealthy scan (half-open, never completes the handshake), but it crafts raw packets so it needs root. When you can’t run as root, Nmap falls back to the Connect scan (-sT): it uses the OS’s normal connection call so any user can run it, but the full connection it opens is more likely to be logged. UDP (-sU) is the slow, ambiguous option, but the only way to find UDP-only services like DNS and SNMP.
+
 
 ## 📊 Key Findings Summary
 
@@ -199,7 +239,7 @@ sudo nmap -sT -Pn --disable-arp-ping -n -p- 192.168.79.130 -oN ~/full_scan.txt
 # while -sT (TCP connect scan) does not strictly require root, though
 # sudo was used here for consistency across all scans.
 
-> "Always add the -n flag to Nmap scans in this VMware environment to prevent DNS resolution hangs."]
+> "Always add the -n flag to Nmap scans in this VMware environment to prevent DNS resolution hangs."
 > 
 > -sP and -sT contradict eachother (Can't be used together because -sP means just do a ping/host-discovery sweep, skip ports entirely but -sT tells Nmap to do a full TCP connect port scan. These commands contradict eachother.)
 
@@ -210,7 +250,7 @@ sudo nmap -sT -Pn --disable-arp-ping -n -p- 192.168.79.130 -oN ~/full_scan.txt
 
 ## 📌 About This Project
 
-[This repository is part of my broader cybersecurity portfolio, focused on understanding the practical tradeoffs between different Nmap scan types — speed, stealth, and completeness — and knowing when each is the right tool for a given assessment scenario.]
+This repository is part of my broader cybersecurity portfolio, focused on understanding the practical tradeoffs between different Nmap scan types (speed, stealth, and completeness) and knowing when each is the right tool for a given assessment scenario.
 
 
 ---
