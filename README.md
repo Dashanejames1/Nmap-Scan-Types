@@ -30,7 +30,7 @@ This repository documents a series of nmap scan results performed in an isolated
 ## 🛠️ Tools Used
 
 - **Nmap** — Used to run and compare SYN, UDP, and full TCP connect scans against the target
-
+- **Metasploitable** — Acts as a target machine with many intentional vulnerabilities to practice penetration testing, ethical hacking, and securely auditing safely.
 ---
 
 ## 📁 Repository Structure
