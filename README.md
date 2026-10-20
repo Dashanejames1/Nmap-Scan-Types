@@ -2,7 +2,6 @@
 
 **Author:** Dashane James  
 **Lab Environment:** VMware Workstation | Kali Linux | Metasploitable 2 
-
 **Purpose:** The goal of this repository was to use Nmap to recognize the similarities/differences in major scan types(SYN scan, UDP Scan, full port scan) and to recognize when is the appropriate times to utilize each scan type.
 **Status:** 🔵 Completed
 
